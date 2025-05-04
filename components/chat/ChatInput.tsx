@@ -1,3 +1,4 @@
+// components/chat/ChatInput.tsx
 "use client"
 
 import React, { useState, useRef, useEffect } from 'react';
@@ -39,38 +40,39 @@ const ChatInput: React.FC<ChatInputProps> = ({ onSendMessage }) => {
   };
 
   return (
-    <div className="relative">
-      <form onSubmit={handleSubmit} className="relative">
-        <input
-          ref={textareaRef}
-          value={message}
-          onChange={(e) => setMessage(e.target.value)}
-          onKeyDown={handleKeyDown}
-          placeholder={
-            isDisabled 
-              ? "Processing your request..." 
-              : "Type your message..."
-          }
-          disabled={isDisabled}
-          className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-amber-500/30 bg-white text-gray-900 placeholder-gray-500"
-        />
+    <form onSubmit={handleSubmit} className="relative">
+      <textarea
+        ref={textareaRef}
+        value={message}
+        onChange={(e) => setMessage(e.target.value)}
+        onKeyDown={handleKeyDown}
+        placeholder={
+          isDisabled 
+            ? "Processing your request..." 
+            : "Type your message..."
+        }
+        disabled={isDisabled}
+        className="w-full p-3 pr-16 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none bg-white text-gray-900"
+        rows={1}
+      />
+      <div className="absolute bottom-3 right-3 flex items-center space-x-2">
         <button
           type="submit"
           disabled={!message.trim() || isDisabled}
-          className={`absolute right-2 top-1/2 transform -translate-y-1/2 px-4 py-1 rounded-md ${
+          className={`px-3 py-1 rounded-md ${
             !message.trim() || isDisabled
               ? 'bg-gray-200 text-gray-500 cursor-not-allowed'
-              : 'bg-amber-100 text-gray-800 hover:bg-amber-200 border border-amber-200'
+              : 'bg-blue-600 text-white hover:bg-blue-700'
           }`}
         >
           Send
         </button>
-      </form>
-      <div className="text-xs text-gray-500 mt-1 ml-1">
+      </div>
+      <div className="text-xs text-gray-500 mt-1">
         Press Enter to send, Shift+Enter for new line
       </div>
-    </div>
+    </form>
   );
-}
+};
 
 export default ChatInput;
