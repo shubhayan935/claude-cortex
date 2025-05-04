@@ -1,6 +1,9 @@
+// components/chat/ChatMessage.tsx
+"use client"
+
 import React from 'react';
-import { Message, MessageRole } from '../../lib/types';
-import ScreenshotGallery from './ScreenshotGallery';
+import { Message, MessageRole, AgentStatus } from '../../lib/types';
+import ActionStep from './ActionStep';
 
 interface ChatMessageProps {
   message: Message;
@@ -17,30 +20,44 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
             ? 'bg-blue-600 text-white'
             : 'bg-white border border-gray-200'
         }`}
+        style={{ width: isUser ? 'auto' : '100%' }}
       >
-        <div className="whitespace-pre-wrap">{message.content}</div>
+        {/* User message or agent plain response */}
+        <div className="whitespace-pre-wrap mb-3">{message.content}</div>
         
-        {/* Show screenshots if available */}
-        {!isUser && message.screenshots && message.screenshots.length > 0 && (
+        {/* Agent actions with steps */}
+        {!isUser && message.agentActions && message.agentActions.length > 0 && (
           <div className="mt-4">
-            <ScreenshotGallery screenshots={message.screenshots} />
+            {/* Render action header */}
+            {message.agentActions.map((action, index) => (
+              <div key={index} className="mb-2">
+                <div className="font-medium text-gray-900">{action.title}</div>
+                {action.description && (
+                  <div className="text-sm text-gray-700">{action.description}</div>
+                )}
+              </div>
+            ))}
           </div>
         )}
         
-        {/* Show agent actions if available */}
-        {!isUser && message.agentActions && message.agentActions.length > 0 && (
-          <div className="mt-3 pt-3 border-t border-gray-200">
-            <h4 className="text-sm font-medium text-gray-700 mb-2">Agent Actions:</h4>
-            <ul className="space-y-2">
-              {message.agentActions.map((action, index) => (
-                <li key={index} className="text-sm">
-                  <span className="font-medium">{action.title}</span>
-                  {action.description && (
-                    <p className="text-gray-600">{action.description}</p>
-                  )}
-                </li>
-              ))}
-            </ul>
+        {/* Screenshots as individual steps */}
+        {!isUser && message.screenshots && message.screenshots.length > 0 && (
+          <div className="mt-4">
+            {message.screenshots.map((screenshot, index) => (
+              <ActionStep
+                key={index}
+                title={`Visited ${screenshot.description || `Step ${screenshot.step}`}`}
+                screenshot={screenshot}
+                status={index === message.screenshots!.length - 1 && 
+                        message.agentActions && 
+                        message.agentActions[0]?.status === AgentStatus.Executing ? 
+                        "Executing..." : "Completed"}
+                isLoading={index === message.screenshots!.length - 1 && 
+                          message.agentActions && 
+                          (message.agentActions[0]?.status === AgentStatus.Thinking || 
+                           message.agentActions[0]?.status === AgentStatus.Executing)}
+              />
+            ))}
           </div>
         )}
       </div>

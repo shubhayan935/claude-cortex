@@ -1,6 +1,8 @@
+// components/chat/ScreenshotGallery.tsx
+"use client"
+
 import React, { useState } from 'react';
 import { Screenshot } from '../../lib/types';
-import Image from 'next/image';
 
 interface ScreenshotGalleryProps {
   screenshots: Screenshot[];
@@ -11,22 +13,20 @@ const ScreenshotGallery: React.FC<ScreenshotGalleryProps> = ({ screenshots }) =>
   const selectedScreenshot = screenshots[selectedIndex];
 
   return (
-    <div>
-      <h4 className="text-sm font-medium text-gray-700 mb-2">Browser Screenshots:</h4>
-      
+    <div className="p-3 max-w-400px">
       {/* Main screenshot display */}
-      <div className="border border-gray-200 rounded-lg overflow-hidden mb-2">
+      <div className="rounded-lg overflow-hidden mb-3 bg-gray-900">
         {selectedScreenshot.base64 ? (
           <img 
             src={`data:image/png;base64,${selectedScreenshot.base64}`} 
             alt={`Screenshot step ${selectedScreenshot.step}`}
-            className="w-full max-h-96 object-contain"
+            className="w-full object-contain"
           />
         ) : (
           <img 
             src={selectedScreenshot.url} 
             alt={`Screenshot step ${selectedScreenshot.step}`}
-            className="w-full max-h-96 object-contain"
+            className="w-full object-contain"
           />
         )}
       </div>
@@ -39,7 +39,7 @@ const ScreenshotGallery: React.FC<ScreenshotGalleryProps> = ({ screenshots }) =>
               key={index}
               onClick={() => setSelectedIndex(index)}
               className={`cursor-pointer border-2 rounded-md overflow-hidden flex-shrink-0 ${
-                index === selectedIndex ? 'border-blue-500' : 'border-gray-200'
+                index === selectedIndex ? 'border-blue-500' : 'border-gray-700'
               }`}
             >
               {screenshot.base64 ? (
@@ -65,7 +65,7 @@ const ScreenshotGallery: React.FC<ScreenshotGalleryProps> = ({ screenshots }) =>
       )}
       
       {/* Step indicator */}
-      <div className="text-xs text-gray-500 mt-1">
+      <div className="text-xs text-gray-400 mt-1">
         Step {selectedScreenshot.step} of {screenshots.length}
         {selectedScreenshot.description && ` - ${selectedScreenshot.description}`}
       </div>

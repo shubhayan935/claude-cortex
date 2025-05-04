@@ -1,3 +1,6 @@
+// components/chat/ChatInput.tsx
+"use client"
+
 import React, { useState, useRef, useEffect } from 'react';
 import { useChat } from '../../context/ChatContext';
 import { AgentStatus } from '../../lib/types';
@@ -49,7 +52,7 @@ const ChatInput: React.FC<ChatInputProps> = ({ onSendMessage }) => {
             : "Type your message..."
         }
         disabled={isDisabled}
-        className="w-full p-3 pr-16 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+        className="w-full p-3 pr-16 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none bg-white text-gray-900"
         rows={1}
       />
       <div className="absolute bottom-3 right-3 flex items-center space-x-2">

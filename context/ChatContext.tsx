@@ -48,8 +48,75 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
   const [currentAction, setCurrentAction] = useState<AgentAction | null>(null);
   const [isConnected, setIsConnected] = useState<boolean>(false);
 
-  // Initialize with a default chat
+  const handleWebSocketMessage = (data: WebSocketMessage) => {
+    if (data.screenshot_url && data.step !== undefined) {
+      const newScreenshot: Screenshot = {
+        url: data.screenshot_url,
+        base64: data.screenshot_base64,
+        step: data.step,
+      };
+      
+      setCurrentScreenshots(prev => [...prev, newScreenshot]);
+      
+      // Update the current action to reflect progress
+      setCurrentAction(prev => {
+        if (prev) {
+          return {
+            ...prev,
+            status: AgentStatus.Executing,
+            description: `Step ${data.step}: Processing`,
+          };
+        }
+        return prev;
+      });
+    }
+
+    if (data.error) {
+      setAgentStatus(AgentStatus.Error);
+      // Pass the current action and screenshots to preserve them
+      addAgentMessage(`Error: ${data.error}`, 
+        currentAction ? [currentAction] : [], 
+        [...currentScreenshots]
+      );
+    }
+
+    if (data.done && data.result) {
+      setAgentStatus(AgentStatus.Done);
+      // Save the current action and screenshots with the message
+      // instead of clearing them immediately
+      addAgentMessage(data.result, 
+        currentAction ? [currentAction] : [], 
+        [...currentScreenshots]
+      );
+      
+      // Reset current states after saving them with the message
+      setTimeout(() => {
+        setCurrentAction(null);
+        setCurrentScreenshots([]);
+      }, 500);
+    }
+  };
+
+  // Initialize with a default chat and WebSocket connection
   useEffect(() => {
+    const storedChats = localStorage.getItem('cortex-chats');
+    if (storedChats) {
+      try {
+        const parsedChats = JSON.parse(storedChats) as Chat[];
+        setChats(parsedChats);
+        if (parsedChats.length > 0) {
+          setCurrentChat(parsedChats[0]);
+        } else {
+          createNewChat();
+        }
+      } catch (error) {
+        console.error('Error parsing stored chats:', error);
+        createNewChat();
+      }
+    } else {
+      createNewChat();
+    }
+
     // Initialize the WebSocket client
     const wsClient = getWebSocketClient(
       'ws://localhost:8000/ws/agent',
@@ -81,43 +148,7 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
       clearInterval(reconnectInterval);
       wsClient.disconnect();
     };
-  }, []); // Empty dependency array means this runs once on mount
-
-  // Update the sendMessage function
-  const sendMessage = (content: string) => {
-    if (!content.trim()) return;
-    
-    // Add user message
-    addUserMessage(content);
-    
-    // Set up agent status
-    setAgentStatus(AgentStatus.Thinking);
-    setCurrentScreenshots([]);
-    
-    // Add initial "thinking" message from agent
-    const thinkingAction: AgentAction = {
-      title: 'Thinking and working...',
-      status: AgentStatus.Thinking,
-    };
-    setCurrentAction(thinkingAction);
-    
-    // Get WebSocket client (already connected from useEffect)
-    const wsClient = getWebSocketClient();
-    
-    // Send task to the agent (no need to connect first)
-    wsClient.sendMessage({ task: content });
-    
-    // Update initial action to browser agent initializing
-    setTimeout(() => {
-      const initAction: AgentAction = {
-        title: 'Browser Agent - Executing browser actions',
-        description: 'Initializing browser agent...',
-        status: AgentStatus.Executing,
-      };
-      setCurrentAction(initAction);
-      setAgentStatus(AgentStatus.Executing);
-    }, 1500);
-  };
+  }, []);
 
   // Save chats to localStorage when they change
   useEffect(() => {
@@ -125,56 +156,6 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
       localStorage.setItem('cortex-chats', JSON.stringify(chats));
     }
   }, [chats]);
-
-  const handleWebSocketMessage = (data: WebSocketMessage) => {
-    if (data.screenshot_url && data.step !== undefined) {
-      const newScreenshot: Screenshot = {
-        url: data.screenshot_url,
-        base64: data.screenshot_base64,
-        step: data.step,
-      };
-      
-      setCurrentScreenshots(prev => [...prev, newScreenshot]);
-      
-      // Update the current action to reflect progress
-      setCurrentAction(prev => {
-        if (prev) {
-          return {
-            ...prev,
-            status: AgentStatus.Executing,
-            description: `Step ${data.step}: Processing`,
-          };
-        }
-        return prev;
-      });
-    }
-
-    if (data.error) {
-      setAgentStatus(AgentStatus.Error);
-      addAgentMessage(`Error: ${data.error}`, [], currentScreenshots);
-    }
-
-    if (data.done && data.result) {
-      setAgentStatus(AgentStatus.Done);
-      addAgentMessage(data.result, [], currentScreenshots);
-      setCurrentAction(null);
-      setCurrentScreenshots([]);
-    }
-  };
-
-  const wsClient = getWebSocketClient(
-    'ws://localhost:8000/ws/agent',
-    handleWebSocketMessage,
-    () => setIsConnected(true),
-    () => {
-      setIsConnected(false);
-      setAgentStatus(AgentStatus.Idle);
-    },
-    (error) => {
-      console.error('WebSocket error:', error);
-      setAgentStatus(AgentStatus.Error);
-    }
-  );
 
   const createNewChat = () => {
     const newChat: Chat = {
@@ -255,6 +236,41 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
     
     setCurrentChat(updatedChat);
     setChats(prev => prev.map(c => c.id === updatedChat.id ? updatedChat : c));
+  };
+
+  const sendMessage = (content: string) => {
+    if (!content.trim()) return;
+    
+    // Add user message
+    addUserMessage(content);
+    
+    // Set up agent status
+    setAgentStatus(AgentStatus.Thinking);
+    setCurrentScreenshots([]);
+    
+    // Add initial "thinking" message from agent
+    const thinkingAction: AgentAction = {
+      title: 'Thinking and working...',
+      status: AgentStatus.Thinking,
+    };
+    setCurrentAction(thinkingAction);
+    
+    // Get WebSocket client (already connected from useEffect)
+    const wsClient = getWebSocketClient();
+    
+    // Send task to the agent
+    wsClient.sendMessage({ task: content });
+    
+    // Update initial action to browser agent initializing
+    setTimeout(() => {
+      const initAction: AgentAction = {
+        title: 'Browser Agent - Executing browser actions',
+        description: 'Initializing browser agent...',
+        status: AgentStatus.Executing,
+      };
+      setCurrentAction(initAction);
+      setAgentStatus(AgentStatus.Executing);
+    }, 1500);
   };
 
   const value = {
