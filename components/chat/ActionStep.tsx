@@ -8,7 +8,7 @@ import { FiChevronDown, FiChevronRight } from 'react-icons/fi';
 interface ActionStepProps {
   title: string;
   description?: string;
-  screenshot: Screenshot; // Changed to single screenshot
+  screenshot: Screenshot; // Single screenshot
   status: string;
   isLoading?: boolean;
 }
@@ -23,10 +23,10 @@ const ActionStep: React.FC<ActionStepProps> = ({
   const [isExpanded, setIsExpanded] = useState(true);
 
   return (
-    <div className="border border-gray-200 rounded-lg mb-3 overflow-hidden bg-white">
+    <div className="border border-gray-200 rounded-lg mb-3 overflow-hidden bg-white" style={{ width: 'fit-content', maxWidth: '100%' }}>
       {/* Header */}
       <div 
-        className="flex items-center gap-2 p-3 cursor-pointer hover:bg-gray-50"
+        className="flex items-center gap-2 p-3 cursor-pointer hover:bg-gray-50 w-full"
         onClick={() => setIsExpanded(!isExpanded)}
       >
         <div className="text-gray-400">
@@ -56,7 +56,7 @@ const ActionStep: React.FC<ActionStepProps> = ({
             <div className="text-sm text-gray-700 mb-3">{description}</div>
           )}
           
-          <div className="border border-gray-200 rounded overflow-hidden mx-auto" style={{ maxWidth: "400px" }}>
+          <div className="border border-gray-200 rounded overflow-hidden" style={{ maxWidth: "400px" }}>
             {screenshot.base64 ? (
               <img 
                 src={`data:image/png;base64,${screenshot.base64}`} 

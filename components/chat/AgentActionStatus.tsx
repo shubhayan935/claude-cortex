@@ -32,7 +32,7 @@ const AgentActionStatus: React.FC<AgentActionStatusProps> = ({
   };
 
   return (
-    <div className="flex flex-col justify-start w-full">
+    <div className="flex flex-col items-start w-auto">
       {/* Show action header */}
       <div className="mb-2">
         <div className="font-medium text-gray-900">{action.title}</div>
@@ -54,7 +54,7 @@ const AgentActionStatus: React.FC<AgentActionStatusProps> = ({
       
       {/* If no screenshots but still in progress */}
       {screenshots.length === 0 && (
-        <div className="border border-gray-200 rounded-lg p-3 bg-white">
+        <div className="border border-gray-200 rounded-lg p-3 bg-white" style={{ width: 'fit-content', maxWidth: '100%' }}>
           <div className="flex items-center gap-3">
             {status === AgentStatus.Thinking && (
               <div className="animate-pulse text-orange-500">
