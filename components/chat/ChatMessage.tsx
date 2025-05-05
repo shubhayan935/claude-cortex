@@ -1,4 +1,3 @@
-// components/chat/ChatMessage.tsx
 "use client"
 
 import type React from "react"
@@ -39,30 +38,31 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
         {/* Screenshots as individual steps */}
         {!isUser && message.screenshots && message.screenshots.length > 0 && (
           <div className="mt-4 flex flex-col items-start">
-            {message.screenshots.map((screenshot, index) => {
-              const isLastStep = index === message.screenshots!.length - 1;
-              const isStepInProgress = 
-                isLastStep && 
-                message.agentActions && 
-                (message.agentActions[0]?.status === AgentStatus.Thinking ||
-                 message.agentActions[0]?.status === AgentStatus.Executing);
-              
-              return (
-                <ActionStep
-                  key={index}
-                  title={`Step ${screenshot.step}`}
-                  screenshot={screenshot}
-                  status={isStepInProgress ? "Executing..." : "Completed"}
-                  isLoading={isStepInProgress}
-                  isCompleted={!isStepInProgress}
-                />
-              );
-            })}
+            {message.screenshots.map((screenshot, index) => (
+              <ActionStep
+                key={index}
+                title={`Step ${screenshot.step}`}
+                screenshot={screenshot}
+                status={
+                  index === message.screenshots!.length - 1 &&
+                  message.agentActions &&
+                  message.agentActions[0]?.status === AgentStatus.Executing
+                    ? "Executing..."
+                    : "Completed"
+                }
+                isLoading={
+                  index === message.screenshots!.length - 1 &&
+                  message.agentActions &&
+                  (message.agentActions[0]?.status === AgentStatus.Thinking ||
+                    message.agentActions[0]?.status === AgentStatus.Executing)
+                }
+              />
+            ))}
           </div>
         )}
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default ChatMessage;
+export default ChatMessage

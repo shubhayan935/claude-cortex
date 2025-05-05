@@ -1,28 +1,19 @@
-// components/chat/ActionStep.tsx
 "use client"
 
 import type React from "react"
 import { useState } from "react"
 import type { Screenshot } from "../../lib/types"
-import { FiChevronDown, FiChevronRight, FiCheck, FiLoader } from "react-icons/fi"
+import { FiChevronDown, FiChevronRight } from "react-icons/fi"
 
 interface ActionStepProps {
   title: string
   description?: string
-  screenshot: Screenshot
+  screenshot: Screenshot // Single screenshot
   status: string
   isLoading?: boolean
-  isCompleted?: boolean
 }
 
-const ActionStep: React.FC<ActionStepProps> = ({ 
-  title, 
-  description, 
-  screenshot, 
-  status, 
-  isLoading = false,
-  isCompleted = false 
-}) => {
+const ActionStep: React.FC<ActionStepProps> = ({ title, description, screenshot, status, isLoading = false }) => {
   const [isExpanded, setIsExpanded] = useState(true)
 
   return (
@@ -47,12 +38,6 @@ const ActionStep: React.FC<ActionStepProps> = ({
                 d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
               />
             </svg>
-          </div>
-        )}
-
-        {isCompleted && !isLoading && (
-          <div className="mr-2 text-green-500">
-            <FiCheck size={18} />
           </div>
         )}
 
