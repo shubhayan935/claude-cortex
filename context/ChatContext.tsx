@@ -92,10 +92,10 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
       );
       
       // Reset current states after saving them with the message
-      setTimeout(() => {
-        setCurrentAction(null);
-        setCurrentScreenshots([]);
-      }, 500);
+      // setTimeout(() => {
+      //   setCurrentAction(null);
+      //   setCurrentScreenshots([]);
+      // }, 500);
     }
   };
 
