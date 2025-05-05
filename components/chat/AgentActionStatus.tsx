@@ -1,3 +1,4 @@
+// components/chat/AgentActionStatus.tsx
 "use client"
 
 import type React from "react"
@@ -26,6 +27,8 @@ const AgentActionStatus: React.FC<AgentActionStatusProps> = ({ action, status, s
     }
   }
 
+  const isActive = status === AgentStatus.Thinking || status === AgentStatus.Executing;
+
   return (
     <div className="flex flex-col items-start w-auto">
       {/* Show action header */}
@@ -35,15 +38,20 @@ const AgentActionStatus: React.FC<AgentActionStatusProps> = ({ action, status, s
       </div>
 
       {/* Show each screenshot as a separate step */}
-      {screenshots.map((screenshot, index) => (
-        <ActionStep
-          key={index}
-          title={`Step ${screenshot.step}`}
-          screenshot={screenshot}
-          status={getStatusText()}
-          isLoading={status === AgentStatus.Thinking || status === AgentStatus.Executing}
-        />
-      ))}
+      {screenshots.map((screenshot, index) => {
+        const isCurrentStep = index === screenshots.length - 1;
+        
+        return (
+          <ActionStep
+            key={index}
+            title={`Step ${screenshot.step}`}
+            screenshot={screenshot}
+            status={getStatusText()}
+            isLoading={isCurrentStep && isActive}
+            isCompleted={!isActive || !isCurrentStep}
+          />
+        );
+      })}
 
       {/* If no screenshots but still in progress */}
       {screenshots.length === 0 && (
