@@ -49,11 +49,13 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
   const [isConnected, setIsConnected] = useState<boolean>(false);
 
   const handleWebSocketMessage = (data: WebSocketMessage) => {
+    console.log('WebSocket message received:', data);
     if (data.screenshot_url && data.step !== undefined) {
       const newScreenshot: Screenshot = {
         url: data.screenshot_url,
         base64: data.screenshot_base64,
         step: data.step,
+        description: data.status,
       };
       
       setCurrentScreenshots(prev => [...prev, newScreenshot]);
@@ -64,7 +66,7 @@ export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
           return {
             ...prev,
             status: AgentStatus.Executing,
-            description: `Step ${data.step}: Processing`,
+            // description: `Step ${data.step}: Processing`,
           };
         }
         return prev;

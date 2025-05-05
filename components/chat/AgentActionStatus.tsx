@@ -38,7 +38,7 @@ const AgentActionStatus: React.FC<AgentActionStatusProps> = ({ action, status, s
       {screenshots.map((screenshot, index) => (
         <ActionStep
           key={index}
-          title={`Visited ${screenshot.description || `Step ${screenshot.step}`}`}
+          title={`Step ${screenshot.step}`}
           screenshot={screenshot}
           status={getStatusText()}
           isLoading={status === AgentStatus.Thinking || status === AgentStatus.Executing}

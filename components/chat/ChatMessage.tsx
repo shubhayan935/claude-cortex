@@ -41,7 +41,7 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
             {message.screenshots.map((screenshot, index) => (
               <ActionStep
                 key={index}
-                title={`Visited ${screenshot.description || `Step ${screenshot.step}`}`}
+                title={`Step ${screenshot.step}`}
                 screenshot={screenshot}
                 status={
                   index === message.screenshots!.length - 1 &&

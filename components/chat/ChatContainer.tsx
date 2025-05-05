@@ -20,9 +20,8 @@ const ChatContainer: React.FC = () => {
   return (
     <div className="flex flex-col h-full bg-gray-50">
       {/* Header */}
-      <div className="p-4 border-b border-gray-200 bg-white flex items-center justify-between">
+      {/* <div className="p-4 border-b border-gray-200 bg-white flex items-center justify-between">
         <div className="flex items-center gap-2">
-          {/* App name */}
           <h2 className="text-xl font-medium text-gray-900">Cortex Analysis</h2>
           {isConnected && (
             <div className="flex items-center ml-2">
@@ -37,7 +36,7 @@ const ChatContainer: React.FC = () => {
         >
           New Analysis
         </button>
-      </div>
+      </div> */}
 
       {/* Messages area */}
       <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50">
